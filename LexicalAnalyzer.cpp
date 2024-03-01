@@ -7,7 +7,10 @@ using namespace std;
 void identifyToken(const string& token);
 bool isKeyword(const string& token);
 bool isDataType(const string& token);
+bool isOperator(char c);
 bool isSpecialChar(char c);
+bool isNumber(const string& token);
+bool isIdentifier(const string& token);
 
 int main() {
     string inputCode;
@@ -24,9 +27,12 @@ int main() {
                 identifyToken(token);
                 token.clear(); // Reset token
             }
-            if (isSpecialChar(c)) {
-                string specialToken(1, c);
-                identifyToken(specialToken);
+            if (isOperator(c)) {
+                string operatorToken(1, c);
+                identifyToken(operatorToken);
+            } else if (isSpecialChar(c)) {
+                string specialCharToken(1, c);
+                identifyToken(specialCharToken);
             }
         }
     }
@@ -45,8 +51,18 @@ void identifyToken(const string& token) {
         cout << token << " is a keyword.\n";
     } else if (isDataType(token)) {
         cout << token << " is a data type.\n";
-    } else {
+    } else if (isNumber(token)) {
+        cout << token << " is a number.\n";
+    } else if (isIdentifier(token)) {
         cout << token << " is an identifier.\n";
+    } else if (token.size() == 1) {
+        if (isOperator(token[0])) {
+            cout << token << " is an operator.\n";
+        } else if (isSpecialChar(token[0])) {
+            cout << token << " is a special character.\n";
+        }
+    } else {
+        cout << token << " is an unrecognized token.\n";
     }
 }
 
@@ -70,6 +86,31 @@ bool isDataType(const string& token) {
     return false;
 }
 
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '=');
+}
+
 bool isSpecialChar(char c) {
-    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '=' || c == '<' || c == '>' || c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']' || c == ';' || c == ',');
+    return (c == '<' || c == '>' || c == ';' || c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']');
+}
+
+bool isNumber(const string& token) {
+    for (char c : token) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isIdentifier(const string& token) {
+    if (isdigit(token[0])) {
+        return false;
+    }
+    for (char c : token) {
+        if (!isalnum(c) && c != '_') {
+            return false;
+        }
+    }
+    return true;
 }
